@@ -2,8 +2,10 @@ const express=require("express");
 const router=express.Router();
 const zod=require("zod");
 const {User}=require("../db");
+const jwt=require("jsonwebtoken");
+const {JWT_SECRET}=require("../config");
 
-const userSchema=zod.object({
+const signUpBody=zod.object({
     username: zod.string().email(),
     password: zod.string(),
     firstName: zod.string(),
@@ -11,7 +13,7 @@ const userSchema=zod.object({
 });
 
 router.post("/signup", async (req, res)=>{
-    const {success}=userSchema.safeParse(req.body);
+    const {success}=signUpBody.safeParse(req.body);
     if(!success){
         return res.status(411).json({
             message: "Incorrect inputs"
@@ -38,6 +40,40 @@ router.post("/signup", async (req, res)=>{
     res.json({
         message: "User created successfully",
     })
+});
+
+const signInBody = zod.object({
+    username: zod.string().email(),
+    password: zod.string()
+});
+
+router.post("/signin", async (req, res)=>{
+    const {success} = signInBody.safeParse(req.body);
+    if(!success){
+        return res.status(411).json({
+            message: "Invalid inputs"
+        });
+    }
+
+    const ifUserExists=await User.findOne({
+        username: req.body.username,
+        password: req.body.password
+    });
+
+    if(!ifUserExists){
+        return res.status(411).json({
+            message: "Check username or password"
+        });
+    }
+
+    const token=jwt.sign({
+        userId: ifUserExists._id
+    }, JWT_SECRET);
+
+    return res.json({
+        message: "Logged in successfully",
+        token: token,
+    });
 });
 
 module.exports=router
