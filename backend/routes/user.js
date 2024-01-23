@@ -4,6 +4,7 @@ const zod=require("zod");
 const {User}=require("../db");
 const jwt=require("jsonwebtoken");
 const {JWT_SECRET}=require("../config");
+const {authMiddleware}=require("../middleware");
 
 const signUpBody=zod.object({
     username: zod.string().email(),
@@ -75,5 +76,15 @@ router.post("/signin", async (req, res)=>{
         token: token,
     });
 });
+
+const updateBody = zod.object({
+    password: zod.string().optional(),
+    firstName: zod.string().optional(),
+    lastName: zod.string().optional()
+});
+
+router.put("/", authMiddleware, async (req, res)=>{
+    
+})
 
 module.exports=router
