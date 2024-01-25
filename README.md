@@ -1,2 +1,2 @@
 
-## Build a basic version of PayT
+## Build a basic version of PayTM
