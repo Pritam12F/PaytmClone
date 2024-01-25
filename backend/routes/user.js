@@ -1,143 +1,150 @@
-const express=require("express");
-const router=express.Router();
-const zod=require("zod");
-const {User, Account}=require("../db");
-const jwt=require("jsonwebtoken");
-const {JWT_SECRET}=require("../config");
-const {authMiddleware}=require("../middleware");
+const express = require("express");
+const router = express.Router();
+const zod = require("zod");
+const { User, Account } = require("../db");
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../config");
+const { authMiddleware } = require("../middleware");
 
-const signUpBody=zod.object({
-    username: zod.string().email(),
-    password: zod.string(),
-    firstName: zod.string(),
-    lastName: zod.string()
+const signUpBody = zod.object({
+  username: zod.string().email(),
+  password: zod.string(),
+  firstName: zod.string(),
+  lastName: zod.string(),
 });
 
-router.post("/signup", async (req, res)=>{
-    const {success}=signUpBody.safeParse(req.body);
-    if(!success){
-        return res.status(411).json({
-            message: "Incorrect inputs"
-        });
-    }
-
-    const tryFindUser = await User.findOne({
-        username: req.body.username
+router.post("/signup", async (req, res) => {
+  const { success } = signUpBody.safeParse(req.body);
+  if (!success) {
+    return res.status(411).json({
+      message: "Incorrect inputs",
     });
+  }
 
-    if(tryFindUser){
-        return res.status(411).json({
-            message: "Email already taken"
-        });
-    }
+  const tryFindUser = await User.findOne({
+    username: req.body.username,
+  });
 
-    const user = await User.create({
-        username: req.body.username,
-        password: req.body.password,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
+  if (tryFindUser) {
+    return res.status(411).json({
+      message: "Email already taken",
     });
+  }
 
-    const userId = user._id;
+  const user = await User.create({
+    username: req.body.username,
+    password: req.body.password,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+  });
 
-    await Account.create({
-      userId: userId,
-      balance: Math.floor(Math.random()*10000)+1
-    });
-    
-    res.json({
-        message: "User created successfully",
-    })
+  const userId = user._id;
+
+  await Account.create({
+    userId: userId,
+    balance: Math.floor(Math.random() * 10000) + 1,
+  });
+
+  res.json({
+    message: "User created successfully",
+  });
 });
 
 const signInBody = zod.object({
-    username: zod.string().email(),
-    password: zod.string()
+  username: zod.string().email(),
+  password: zod.string(),
 });
 
-router.post("/signin", async (req, res)=>{
-    const {success} = signInBody.safeParse(req.body);
-    if(!success){
-        return res.status(411).json({
-            message: "Invalid inputs"
-        });
-    }
-
-    const ifUserExists=await User.findOne({
-        username: req.body.username,
-        password: req.body.password
+router.post("/signin", async (req, res) => {
+  const { success } = signInBody.safeParse(req.body);
+  if (!success) {
+    return res.status(411).json({
+      message: "Invalid inputs",
     });
+  }
 
-    if(!ifUserExists){
-        return res.status(411).json({
-            message: "Check username or password"
-        });
-    }
+  const ifUserExists = await User.findOne({
+    username: req.body.username,
+    password: req.body.password,
+  });
 
-    const token=jwt.sign({
-        userId: ifUserExists._id
-    }, JWT_SECRET);
-
-    return res.json({
-        message: "Logged in successfully",
-        token: token,
+  if (!ifUserExists) {
+    return res.status(411).json({
+      message: "Check username or password",
     });
+  }
+
+  const token = jwt.sign(
+    {
+      userId: ifUserExists._id,
+    },
+    JWT_SECRET
+  );
+
+  return res.json({
+    message: "Logged in successfully",
+    token: token,
+  });
 });
 
 const updateBody = zod.object({
-    password: zod.string().optional(),
-    firstName: zod.string().optional(),
-    lastName: zod.string().optional()
+  password: zod.string().optional(),
+  firstName: zod.string().optional(),
+  lastName: zod.string().optional(),
 });
 
-router.put("/", authMiddleware, async (req, res)=>{
-    
-    const {success}=updateBody.safeParse(req.body);
-    
-    if(!success){
-      return res.status(411).json({
+router.put("/", authMiddleware, async (req, res) => {
+  const { success } = updateBody.safeParse(req.body);
+
+  if (!success) {
+    return res.status(411).json({
       message: "Invalid inputs",
     });
-    }
-    
-    await User.updateOne({
-      _id: req.userId,  
-    },{
+  }
+
+  await User.updateOne(
+    {
+      _id: req.userId,
+    },
+    {
       $set: {
         username: req.body.username,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
-      }
-    });
-    res.json({
-      message: "User updated successfully",
-    })
+      },
+    }
+  );
+  res.json({
+    message: "User updated successfully",
+  });
 });
 
-router.get("/bulk", async (req, res)=>{
-  
-  const query = req.query.filter;
-  
+router.get("/bulk", async (req, res) => {
+  const query = req.query.filter || "";
+
   const users = await User.find({
-    $or: [{
-      firstName: {
-        "$regex": query
-        }
-      },{
+    $or: [
+      {
+        firstName: {
+          $regex: query,
+        },
+      },
+      {
         lastName: {
-          "$regex": query
-        }
-      }]
-  })
+          $regex: query,
+        },
+      },
+    ],
+  });
 
   res.json({
-    user: users.map((user)=>({
+    user: users.map((user) => ({
       username: user.username,
       firstName: user.firstName,
       lastName: user.lastName,
-      _id: user._id
-    }))
-  })
+      _id: user._id,
+    })),
+  });
 });
 
-module.exports=router
+module.exports = router;
