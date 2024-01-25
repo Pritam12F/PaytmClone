@@ -1,7 +1,7 @@
 const express=require("express");
 const router=express.Router();
 const zod=require("zod");
-const {User}=require("../db");
+const {User, Account}=require("../db");
 const jwt=require("jsonwebtoken");
 const {JWT_SECRET}=require("../config");
 const {authMiddleware}=require("../middleware");
@@ -31,13 +31,20 @@ router.post("/signup", async (req, res)=>{
         });
     }
 
-    await User.create({
+    const user = await User.create({
         username: req.body.username,
         password: req.body.password,
         firstName: req.body.firstName,
-        lastName: req.body.lastName
+        lastName: req.body.lastName,
     });
 
+    const userId = user._id;
+
+    await Account.create({
+      userId: userId,
+      balance: Math.floor(Math.random()*10000)+1
+    });
+    
     res.json({
         message: "User created successfully",
     })
