@@ -85,6 +85,52 @@ const updateBody = zod.object({
 
 router.put("/", authMiddleware, async (req, res)=>{
     
-})
+    const {success}=updateBody.safeParse(req.body);
+    
+    if(!success){
+      return res.status(411).json({
+      message: "Invalid inputs",
+    });
+    }
+    
+    await User.updateOne({
+      _id: req.userId,  
+    },{
+      $set: {
+        username: req.body.username,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+      }
+    });
+    res.json({
+      message: "User updated successfully",
+    })
+});
+
+router.get("/bulk", async (req, res)=>{
+  
+  const query = req.query.filter;
+  
+  const users = await User.find({
+    $or: [{
+      firstName: {
+        "$regex": query
+        }
+      },{
+        lastName: {
+          "$regex": query
+        }
+      }]
+  })
+
+  res.json({
+    user: users.map((user)=>({
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      _id: user._id
+    }))
+  })
+});
 
 module.exports=router

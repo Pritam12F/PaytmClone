@@ -3,7 +3,7 @@ const {JWT_SECRET} = require("./config");
 
 function authMiddleware(req, res, next){
     
-    const auth=req.body.authorization;
+    const auth=req.headers.authorization;
 
     if(!auth || !auth.startsWith('Bearer ')){
         return res.status(403).json({message: "access denied"});
@@ -11,7 +11,7 @@ function authMiddleware(req, res, next){
     const token=auth.split(" ")[1];
 
     try{
-        const decoded = jwt.verify(actualToken, JWT_SECRET);
+        const decoded = jwt.verify(token, JWT_SECRET);
         req.userId = decoded.userId;
         next();
     }
