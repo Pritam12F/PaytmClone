@@ -1,8 +1,15 @@
-import { Link } from "react-router-dom"
-
-export const ButtonWarning = ({name, warning})=>{
-    return <div>
-        <span>{name}</span>
-        <Link className="ml-3 underline">{warning}</Link>
+export const ButtonWarning = ({ name, warning, navigate, to }) => {
+  return (
+    <div>
+      <span className="font-medium">{name}</span>
+      <button
+        className="ml-3 underline"
+        onClick={() => {
+          navigate(`${to}`);
+        }}
+      >
+        {warning}
+      </button>
     </div>
-}
+  );
+};
