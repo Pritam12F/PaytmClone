@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Heading } from "../components/Heading";
 import { ProfilePicture } from "../components/ProfilePicture";
 import { Button } from "../components/Button";
@@ -13,7 +13,6 @@ export const Dashboard = () => {
       .get("http://localhost:3000/api/v1/user/bulk?filter=" + filter)
       .then((res) => {
         setUsers(res.data.user);
-        console.log(users);
       });
   }, [filter]);
   return (
