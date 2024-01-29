@@ -8,3 +8,5 @@ export const Balance = memo(() => {
     </div>
   );
 });
+
+Balance.displayName = Balance;

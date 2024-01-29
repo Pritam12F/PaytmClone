@@ -14,3 +14,5 @@ export const Appbar = memo(() => {
     </div>
   );
 });
+
+Appbar.displayName = Appbar;
