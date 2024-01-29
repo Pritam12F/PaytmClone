@@ -147,4 +147,24 @@ router.get("/bulk", async (req, res) => {
   });
 });
 
+router.post("/getinfo", async (req, res) => {
+  const token = req.body.token;
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findOne({
+      _id: decoded.userId,
+    });
+    const account = await Account.findOne({
+      userId: decoded.userId,
+    });
+    res.json({
+      decoded: decoded.userId,
+      firstLetter: user.firstName[0],
+      balance: account.balance,
+    });
+  } catch (err) {
+    res.json({ message: "verification failed" });
+  }
+});
+
 module.exports = router;

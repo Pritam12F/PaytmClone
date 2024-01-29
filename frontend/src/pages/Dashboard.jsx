@@ -8,6 +8,10 @@ import { Users } from "../components/User";
 export const Dashboard = () => {
   const [filter, setFilter] = useState("");
   const [users, setUsers] = useState([]);
+  const token = localStorage.getItem("token");
+  const [balance, setBalance] = useState();
+  const [firstL, setFirstL] = useState("");
+  const [isLogged, setIsLogged] = useState(false);
 
   useEffect(() => {
     axios
@@ -16,11 +20,27 @@ export const Dashboard = () => {
         setUsers(res.data.user);
       });
   }, [filter]);
+
+  useEffect(() => {
+    axios
+      .post("http://localhost:3000/api/v1/user/getinfo", {
+        token,
+      })
+      .then((res) => {
+        setFirstL(res.data.firstLetter);
+        setBalance(res.data.balance);
+        setIsLogged(true);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
+  }, []);
+
   return (
     <div>
-      <Appbar />
+      <Appbar firstL={firstL} />
       <hr></hr>
-      <Balance />
+      <Balance bal={balance} />
       <div className="mt-5">
         <Heading name="Users"></Heading>
         <div className="text-center mt-6">
