@@ -1,6 +1,11 @@
 import { Heading } from "../components/Heading";
 import { InputBox } from "../components/InputBox";
+import { sendingUserState } from "../atoms/atoms";
+import { useRecoilValue } from "recoil";
+
 export const SendMoney = () => {
+  const friendName = useRecoilValue(sendingUserState);
+
   return (
     <div className="border-2 mt-10 w-1/5 px-4 py-8 text-center mx-auto rounded-lg shadow-lg">
       <div>
@@ -10,13 +15,18 @@ export const SendMoney = () => {
         <span className="h-10 w-10 rounded-full bg-green-400 flex justify-center items-center font-semibold text-lg mx-4">
           A
         </span>
-        <span className="font-bold text-3xl">Friend's Name</span>
+        <span className="font-bold text-3xl">{friendName}</span>
       </div>
       <div className="text-md font-semibold my-5">Amount (in Rs.)</div>
       <InputBox type="text" placeh="Enter amount" />
       <button className="bg-green-500 py-2 px-20 rounded-lg text-white my-5">
         Initiate Transfer
       </button>
+      <button
+        onClick={() => {
+          console.log(friendName);
+        }}
+      ></button>
     </div>
   );
 };

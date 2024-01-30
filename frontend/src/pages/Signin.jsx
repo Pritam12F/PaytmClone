@@ -6,11 +6,15 @@ import { InputBox } from "../components/InputBox";
 import { SubHeading } from "../components/SubHeading";
 import { useState } from "react";
 import axios from "axios";
+import { tokenState, loggedInState } from "../atoms/atoms";
+import { useSetRecoilState } from "recoil";
 
 export const Signin = () => {
   const navigate = useNavigate();
   const [mail, setMail] = useState("");
   const [pass, setPass] = useState("");
+  const setToken = useSetRecoilState(tokenState);
+  const setLoggedIn = useSetRecoilState(loggedInState);
 
   return (
     <div className="flex flex-col w-1/4 items-center shadow-lg px-10 py-4 rounded-2xl mx-auto my-20">
@@ -43,6 +47,8 @@ export const Signin = () => {
             .then((res) => {
               navigate("/dashboard");
               localStorage.setItem("token", res.data.token);
+              setToken(res.data.token);
+              setLoggedIn(true);
             })
             .catch((err) => {
               alert(err.response.data.message);
