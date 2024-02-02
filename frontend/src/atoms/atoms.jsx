@@ -10,6 +10,7 @@ export const tokenState = atom({
   default: "",
 });
 
+//The one who is logged in
 export const userState = atom({
   key: "user",
   default: {},
@@ -20,7 +21,13 @@ export const accountState = atom({
   default: {},
 });
 
+//The one who is recieving
 export const sendingUserState = atom({
   key: "sending",
+  default: "",
+});
+
+export const recievingUserState = atom({
+  key: "rec",
   default: "",
 });

@@ -1,11 +1,21 @@
 import { ProfilePicture } from "./ProfilePicture";
 import { Button } from "./Button";
 import { useNavigate } from "react-router-dom";
-import { sendingUserState } from "../atoms/atoms";
-import { useSetRecoilState } from "recoil";
+import {
+  sendingUserState,
+  userState,
+  accountState,
+  recievingUserState,
+} from "../atoms/atoms";
+import { useRecoilState } from "recoil";
+import axios from "axios";
 
 export const Users = ({ user }) => {
-  const setSendingState = useSetRecoilState(sendingUserState);
+  const [sending, setSendingState] = useRecoilState(sendingUserState);
+  const [usrState, setUserState] = useRecoilState(userState);
+  const [acntState, setAcntState] = useRecoilState(accountState);
+  const [rec, setRec] = useRecoilState(recievingUserState);
+
   const navigate = useNavigate();
   return (
     <div className="flex justify-between items-center mx-2 my-2 shadow-md px-2 rounded-lg">
@@ -20,6 +30,7 @@ export const Users = ({ user }) => {
         onClick={() => {
           navigate("/send");
           setSendingState(user.firstName);
+          setRec(user._id);
         }}
       />
     </div>
