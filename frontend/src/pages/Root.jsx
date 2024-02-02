@@ -1,13 +1,12 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 
-export const RootHandler = ()=>{
+export const RootHandler = () => {
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
-    
-    useEffect(()=>{
-        navigate('/dashboard');
-    }, [])
-    
-    return <div className="text-3xl w-1/3">Loading...</div>
-}
+  useEffect(() => {
+    navigate("/signin");
+  }, []);
+
+  return <div className="text-3xl w-1/3">Loading...</div>;
+};
