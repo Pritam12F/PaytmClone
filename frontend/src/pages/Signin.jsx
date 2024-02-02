@@ -46,7 +46,7 @@ export const Signin = () => {
             })
             .then((res) => {
               navigate("/dashboard");
-              localStorage.setItem("token", res.data.token);
+              localStorage.setItem("token", `Bearer ${res.data.token}`);
               setToken(res.data.token);
               setLoggedIn(true);
             })
